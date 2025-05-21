@@ -15,10 +15,12 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 export default function SignIn() {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -35,7 +37,16 @@ export default function SignIn() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       if (email && password) {
-        navigate('/dashboard'); // Redirect to dashboard after successful login
+        // Create a user object with basic information
+        const user = {
+          email,
+          displayName: email.split('@')[0], // Simple display name from email
+          // Add other user fields as needed
+        };
+        
+        // Use the login function from AuthProvider
+        login(user);
+        // No need to navigate here, login function will handle it
       } else {
         setError('Please enter both email and password');
       }

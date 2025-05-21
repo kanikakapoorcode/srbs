@@ -19,11 +19,13 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
 import { countries } from 'countries-list';
+import { useAuth } from '../hooks/useAuth';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -130,13 +132,20 @@ export default function SignUp() {
       }
 
       const { token } = await response.json();
-      localStorage.setItem('token', token);
-      navigate('/signin', { 
-        state: { 
-          success: 'Registration successful! Please sign in.',
-          email: formData.email 
-        } 
-      });
+      
+      // For demonstration purposes, create a user object
+      // In a real app, you might want to fetch user details from a /me endpoint
+      const user = {
+        name: formData.name,
+        email: formData.email,
+        phone: `${formData.countryCode}${formData.phone}`,
+        token: token
+      };
+      
+      // Use the login function from AuthProvider to set user and redirect
+      login(user);
+      
+      // The login function will handle redirection to dashboard
     } catch (err) {
       setApiError(err.message);
     } finally {
